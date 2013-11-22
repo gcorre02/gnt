@@ -19,7 +19,7 @@ namespace NinjaTrader.Strategy
     /// To localise the entry level of the RSI with respect to its extremes.
     /// </summary>
     [Description("To localise the entry level of the RSI with respect to its extremes.")]
-    public class RSI_ret_v12 : Strategy  // rsi updates more live, all arrays[0] point to the most recent one, not the highest of the most recent ones. 
+    public class RSI_ret_v12 : Strategy  // rsi updates more live, all arrays[0] point to the most recent one, not the highest of the most recent ones.// longs seem negative while shorts positive ? 
     {
         #region Variables
         // Wizard generated variables
@@ -60,6 +60,17 @@ namespace NinjaTrader.Strategy
 		private int startingHour5 =0;
 		private int startingMinute5 = 0;
 		private int startingSecond5 = 0;
+		private int endingHour = 23;
+		private int endingMinute = 59;
+		private int endingHour2 = 23;
+		private int endingMinute2 = 59;
+		private int endingHour3 = 23;
+		private int endingMinute3 = 59;
+		private int endingHour4 = 23;
+		private int endingMinute4 = 59;
+		private int endingHour5 = 23;
+		private int endingMinute5 = 59;
+
         // User defined variables (add any user defined variables below)
 		private double aboveLimit = 0;
 		private double belowLimit = 100;
@@ -85,10 +96,11 @@ namespace NinjaTrader.Strategy
 				ExitOnClose = false;
 			}
             if(TurnTrailOn == 1){
-				SetTrailStop("", CalculationMode.Ticks, TrailStopLoss, false);
+				SetTrailStop("onlyOrder", CalculationMode.Ticks, TrailStopLoss, false);
 			} else {
-				SetStopLoss(CalculationMode.Ticks,StopLoss);
+				SetStopLoss("onlyOrder",CalculationMode.Ticks,StopLoss,false);
 			}
+			
             CalculateOnBarClose = false;
 			rsiArray = new Double[storePreviousRsiMax];
 			rsiArray15 = new Double[storePreviousRsiMax];
@@ -96,9 +108,6 @@ namespace NinjaTrader.Strategy
 			Add(PeriodType.Minute, LongRsiLength);
 		}
 
-        /// <summary>
-        /// Called on each bar update event (incoming tick)
-        /// </summary>
 		protected void getRsiRecentHigh(){
 			int len = storePreviousRsiMax;
 			for (int i = len-1; i > 0; i--){
@@ -128,22 +137,6 @@ namespace NinjaTrader.Strategy
 			}
 			return result;
 		}
-		protected Boolean checkRoundNum(){
-			if(TurnCheckRoundNumOn==0){
-				RoundTickDist = 0;
-			}
-			String check = Close[0].ToString();
-			int len = check.Length-2;
-			double units =100;
-			if(len >= 3){
-				units = double.Parse(check.Substring(len,2))*0.01/TickSize;
-			}
-			if (units >= 100 -RoundTickDist || units <= roundTickDist){
-				return false;
-			} else {
-				return true;
-			}
-		}
 		protected bool rocFilter(){
 			if(TurnRocFilterOn == 0){
 				ROCDif = 0;
@@ -162,6 +155,39 @@ namespace NinjaTrader.Strategy
 			* double Optimized value
 			* 
 			*/
+		}
+		protected bool checkOverBoughtRsi15min(){
+			if(rsiArray15[0]>67){
+				//Log("15 min RSI is long",LogLevel.Information);
+				return true;
+			} else {
+				return false;
+			}
+		}
+		protected bool checkOverSoldRsi15min(){
+			if (rsiArray15[0]<33){
+				//Log("15 min RSI is long",LogLevel.Information);
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		protected Boolean checkRoundNum(){
+			if(TurnCheckRoundNumOn==0){
+				RoundTickDist = 0;
+			}
+			String check = Close[0].ToString();
+			int len = check.Length-2;
+			double units =100;
+			if(len >= 3){
+				units = double.Parse(check.Substring(len,2))*0.01/TickSize;
+			}
+			if (units >= 100 -RoundTickDist || units <= roundTickDist){
+				return false;
+			} else {
+				return true;
+			}
 		}
 		protected String checkRecentLossDirection(){
 			Boolean recentLoss = false;
@@ -194,29 +220,46 @@ namespace NinjaTrader.Strategy
 			}
 		}
 		
-		protected bool checkOverBoughtRsi15min(){
-			if(rsiArray15[0]>67){
-				//Log("15 min RSI is long",LogLevel.Information);
-				return true;
-			} else {
-				return false;
-			}
-		}
+		#region TimeFrames
 		protected bool timeframe(){
-			if (//Times[0][0].DayOfWeek == DayOfWeek.Monday && 
-				Times[0][0].Hour >= StartingHour 
+			// check if it is less than 15 minutes away, so strategy can exit any current positions.
+			DateTime targetTime = new DateTime(Times[0][0].Year,
+				Times[0][0].Month,
+				Times[0][0].Day,
+				StartingHour, 
+				StartingMinute,
+				StartingSecond,
+				DateTimeKind.Local); //= new DateTime();
+			TimeSpan target = new TimeSpan(0,15,0);
+			TimeSpan zero = new TimeSpan(0,0,0);
+			//Print("target is "+target.ToString() + " and difference between setUp and currentTime is" + targetTime.Subtract(Times[0][0]));
+			if(targetTime.Subtract(Times[0][0])<target
+				&& targetTime.Subtract(Times[0][0])>zero){
+				if(Position.MarketPosition == MarketPosition.Long){
+					ExitLong("onlyOrder");
+				} else if(Position.MarketPosition == MarketPosition.Short){
+					ExitShort("onlyOrder");
+				}
+			}
+			//targetTime = DateTime.Parse(StartingHour.ToString() + "/"+StartingMinute.ToString() + "/00");
+			//Times[0][0].
+			if (Times[0][0].Hour >= StartingHour 
 				&& Times[0][0].Minute >= StartingMinute 
-				&& Times[0][0].Second>= StartingSecond){
+				&& Times[0][0].Second>= StartingSecond
+				&& Times[0][0].Hour <= EndingHour 
+				&& Times[0][0].Minute <= EndingMinute ){
 					return true;
 				} else {
 					return false;
 				}
 		}
-				protected bool timeframe2(){
+		protected bool timeframe2(){
 			if (//Times[0][0].DayOfWeek == DayOfWeek.Monday && 
 				Times[0][0].Hour >= StartingHour2 
 				&& Times[0][0].Minute >= StartingMinute2 
-				&& Times[0][0].Second>= StartingSecond2){
+				&& Times[0][0].Second>= StartingSecond2
+				&& Times[0][0].Hour <= EndingHour2 
+				&& Times[0][0].Minute <= EndingMinute2 ){
 					return true;
 				} else {
 					return false;
@@ -226,7 +269,9 @@ namespace NinjaTrader.Strategy
 			if (//Times[0][0].DayOfWeek == DayOfWeek.Monday && 
 				Times[0][0].Hour >= StartingHour3 
 				&& Times[0][0].Minute >= StartingMinute3 
-				&& Times[0][0].Second>= StartingSecond3){
+				&& Times[0][0].Second>= StartingSecond3
+				&& Times[0][0].Hour <= EndingHour3 
+				&& Times[0][0].Minute <= EndingMinute3 ){
 					return true;
 				} else {
 					return false;
@@ -236,7 +281,9 @@ namespace NinjaTrader.Strategy
 			if (//Times[0][0].DayOfWeek == DayOfWeek.Monday && 
 				Times[0][0].Hour >= StartingHour4 
 				&& Times[0][0].Minute >= StartingMinute4 
-				&& Times[0][0].Second>= StartingSecond4){
+				&& Times[0][0].Second>= StartingSecond4
+				&& Times[0][0].Hour <= EndingHour4 
+				&& Times[0][0].Minute <= EndingMinute4 ){
 					return true;
 				} else {
 					return false;
@@ -246,24 +293,21 @@ namespace NinjaTrader.Strategy
 			if (//Times[0][0].DayOfWeek == DayOfWeek.Monday && 
 				Times[0][0].Hour >= StartingHour5 
 				&& Times[0][0].Minute >= StartingMinute5 
-				&& Times[0][0].Second>= StartingSecond5){
+				&& Times[0][0].Second>= StartingSecond5
+				&& Times[0][0].Hour <= EndingHour5 
+				&& Times[0][0].Minute <= EndingMinute5 ){
 					return true;
 				} else {
 					return false;
 				}
 		}
-
-		protected bool checkOverSoldRsi15min(){
-			if (rsiArray15[0]<33){
-				//Log("15 min RSI is long",LogLevel.Information);
-				return true;
-			} else {
-				return false;
-			}
-		}
-
+		#endregion
+		
         protected override void OnBarUpdate()
         {
+		//	Print(" This is the position: " + Position.MarketPosition.ToString()+ " and the 15min rsi is " + rsiArray15[0]);
+		//	Print(" This is the position: " + Positions[0].MarketPosition.ToString()+ " and the 15min rsi is " + rsiArray15[0]);
+			//Log(" This is the position: " + Positions[0].MarketPosition.ToString(), LogLevel.Information);
 			if((GetCurrentAsk()-GetCurrentBid())<BidAsk*TickSize 
 				&& checkRoundNum()
 				//&& checkLongRsi()
@@ -272,6 +316,7 @@ namespace NinjaTrader.Strategy
 			} else {
 				itsOn = 0;
 			}
+			timeframe();
 			if(CurrentBar < RSIPeriod || itsOn == 0){
 				return;
 			}
@@ -284,6 +329,7 @@ namespace NinjaTrader.Strategy
 			getRsi15RecentHigh();
 			getRocRecentHigh();
 			//Log(getRsiArrayContents(),LogLevel.Information);
+			
 			//condition for oversold
 			
 			Boolean shortIsPositive = true;
@@ -309,7 +355,7 @@ namespace NinjaTrader.Strategy
 					&& timeframe5())
            	 	{
 					this.longPriceDif = 0;
-            	    EnterLong(DefaultQuantity, "");
+            	    EnterLong(DefaultQuantity, "onlyOrder");
             	}
 			}
 			//condition for overbought
@@ -337,7 +383,7 @@ namespace NinjaTrader.Strategy
 					)
             	{
 					this.shortPriceDif= 0;
-                	EnterShort(DefaultQuantity, "");
+                	EnterShort(DefaultQuantity, "onlyOrder");
             	}
 			}
         }
@@ -583,6 +629,66 @@ namespace NinjaTrader.Strategy
         {
             get { return startingSecond5; }
             set { startingSecond5 = Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int EndingHour 
+        {
+            get { return endingHour; }
+            set { endingHour= Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int EndingMinute 
+        {
+            get { return endingMinute ; }
+            set { endingMinute = Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int EndingHour2
+        {
+            get { return endingHour2; }
+            set { endingHour2= Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int EndingMinute2
+        {
+            get { return endingMinute2; }
+            set { endingMinute2 = Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int EndingHour3
+        {
+            get { return endingHour3; }
+            set { endingHour3= Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int EndingMinute3
+        {
+            get { return endingMinute3; }
+            set { endingMinute3 = Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int EndingHour4
+        {
+            get { return endingHour4; }
+            set { endingHour4= Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int EndingMinute4
+        {
+            get { return endingMinute4; }
+            set { endingMinute4 = Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int EndingHour5
+        {
+            get { return endingHour5; }
+            set { endingHour5= Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int EndingMinute5
+        {
+            get { return endingMinute5; }
+            set { endingMinute5 = Math.Max(0, value); }
         }
 
 

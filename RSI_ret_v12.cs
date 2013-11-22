@@ -19,7 +19,7 @@ namespace NinjaTrader.Strategy
     /// To localise the entry level of the RSI with respect to its extremes.
     /// </summary>
     [Description("To localise the entry level of the RSI with respect to its extremes.")]
-    public class RSI_ret_v11 : Strategy  //Ver 10 - Gold Optimized, but works for everything // Version 11 - W/ time intervals coded in . 
+    public class RSI_ret_v12 : Strategy  // rsi updates more live; 
     {
         #region Variables
         // Wizard generated variables

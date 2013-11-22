@@ -19,7 +19,7 @@ namespace NinjaTrader.Strategy
     /// To localise the entry level of the RSI with respect to its extremes.
     /// </summary>
     [Description("To localise the entry level of the RSI with respect to its extremes.")]
-    public class RSI_ret_v12 : Strategy  // rsi updates more live; 
+    public class RSI_ret_v12 : Strategy  // rsi updates more live, all arrays[0] point to the most recent one, not the highest of the most recent ones. 
     {
         #region Variables
         // Wizard generated variables
@@ -56,6 +56,8 @@ namespace NinjaTrader.Strategy
 		private double shortPriceDif = 0;
 		private int storePreviousRsiMax = 5;
 		private Double[] rsiArray;
+		private Double[] rsiArray15;
+		private Double[] rocArray;
 		//private int timeOff = 1;
         #endregion
 
@@ -77,6 +79,8 @@ namespace NinjaTrader.Strategy
 			}
             CalculateOnBarClose = false;
 			rsiArray = new Double[storePreviousRsiMax];
+			rsiArray15 = new Double[storePreviousRsiMax];
+			rocArray = new Double[storePreviousRsiMax];
 			Add(PeriodType.Minute, LongRsiLength);
 		}
 
@@ -90,6 +94,21 @@ namespace NinjaTrader.Strategy
 			}
 			rsiArray[0] = RSI(RSIPeriod,3)[0];
 		}
+		protected void getRsi15RecentHigh(){
+			int len = storePreviousRsiMax;
+			for (int i = len-1; i > 0; i--){
+				rsiArray15[i] = rsiArray15[i-1];
+			}
+			rsiArray15[0] = RSI(BarsArray[1],LongRsiPeriod,3)[0];
+		}
+		protected void getRocRecentHigh(){
+			int len = storePreviousRsiMax;
+			for (int i = len-1; i > 0; i--){
+				rocArray[i] = rocArray[i-1];
+			}
+			rocArray[0] = ROC(ROCPeriod)[0];
+		}
+
 		protected String getRsiArrayContents(){
 			String result = "";
 			for(int i = 0; i < storePreviousRsiMax; i++){
@@ -117,7 +136,7 @@ namespace NinjaTrader.Strategy
 			if(TurnRocFilterOn == 0){
 				ROCDif = 0;
 			}
-			double maxROC = Math.Max(Math.Abs(ROC(ROCPeriod)[0]),Math.Abs(ROC(ROCPeriod)[0]));
+			double maxROC = Math.Max(Math.Abs(rocArray[0]),Math.Abs(rocArray[1]));
 			if(maxROC>ROCDif){
 				return true;
 			}  else {
@@ -164,7 +183,7 @@ namespace NinjaTrader.Strategy
 		}
 		
 		protected bool checkOverBoughtRsi15min(){
-			if(RSI(BarsArray[1],LongRsiPeriod,3)[0]>67){
+			if(rsiArray15[0]>67){
 				//Log("15 min RSI is long",LogLevel.Information);
 				return true;
 			} else {
@@ -182,7 +201,7 @@ namespace NinjaTrader.Strategy
 				}
 		}
 		protected bool checkOverSoldRsi15min(){
-			if(RSI(BarsArray[1],LongRsiPeriod,3)[0]<33){
+			if (rsiArray15[0]<33){
 				//Log("15 min RSI is long",LogLevel.Information);
 				return true;
 			} else {
@@ -209,6 +228,8 @@ namespace NinjaTrader.Strategy
 			aboveLimit = 0;
 			//Load rsi values to array
 			getRsiRecentHigh();
+			getRsi15RecentHigh();
+			getRocRecentHigh();
 			//Log(getRsiArrayContents(),LogLevel.Information);
 			//condition for oversold
 			
@@ -219,7 +240,7 @@ namespace NinjaTrader.Strategy
 					shortIsPositive = false;
 				}
 			}
-			if(RSI(RSIPeriod,3)[0]<OverSoldLevel){
+			if(rsiArray[0]<OverSoldLevel){
 				belowLimit = rsiArray[1];
         	    if (CrossAbove(RSI(RSIPeriod,3), belowLimit, 1) 
 					&& (RSI(RSIPeriod,3)[0]-belowLimit>=entryLevelDif )
@@ -242,7 +263,7 @@ namespace NinjaTrader.Strategy
 					longIsPositive = false;
 				}
 			}
-			if(RSI(RSIPeriod,3)[0]>OverBoughtLevel){
+			if(rsiArray[0]>OverBoughtLevel){
 				aboveLimit = rsiArray[1];         
             	if (CrossBelow(RSI(RSIPeriod,3), aboveLimit, 1)
 					&& ( aboveLimit-RSI(RSIPeriod,3)[0]>=entryLevelDif) 

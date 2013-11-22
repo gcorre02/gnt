@@ -106,6 +106,11 @@ namespace NinjaTrader.Strategy
 			rsiArray15 = new Double[storePreviousRsiMax];
 			rocArray = new Double[storePreviousRsiMax];
 			Add(PeriodType.Minute, LongRsiLength);
+			if(Position.MarketPosition == MarketPosition.Long){
+					ExitLong();//maybe it is wrong name ?
+			} else if(Position.MarketPosition == MarketPosition.Short){
+					ExitShort();//maybe it is wrong name ? // alternative : ExitShort("onlyOrder");
+			}
 		}
 
 		protected void getRsiRecentHigh(){

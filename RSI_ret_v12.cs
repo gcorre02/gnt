@@ -424,11 +424,11 @@ namespace NinjaTrader.Strategy
 					&& shortIsPositive
 					&& rocFilter()
 					&& !checkOverBoughtRsi15min()
-					&& timeframe()
-					&& timeframe2()
-					&& timeframe3()
-					&& timeframe4()
-					&& timeframe5())
+					&& (timeframe()
+					|| timeframe2()
+					|| timeframe3()
+					|| timeframe4()
+					|| timeframe5()))
            	 	{
 					this.longPriceDif = 0;
             	    EnterLong(DefaultQuantity, "onlyOrder");
@@ -451,11 +451,11 @@ namespace NinjaTrader.Strategy
 					&& longIsPositive
 					&& rocFilter()
 					&& !checkOverSoldRsi15min()
-					&& timeframe()
-					&& timeframe2()
-					&& timeframe3()
-					&& timeframe4()
-					&& timeframe5()
+					&& (timeframe()
+					|| timeframe2()
+					|| timeframe3()
+					|| timeframe4()
+					|| timeframe5())
 					)
             	{
 					this.shortPriceDif= 0;

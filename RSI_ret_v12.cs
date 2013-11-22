@@ -45,9 +45,21 @@ namespace NinjaTrader.Strategy
 		private int turnLastStopMinOn = 0;
 		private int longRsiPeriod =9;
 		private int longRsiLength = 15;
-		private int startingHour = 12;
-		private int startingMinute = 21;
-		private int startingSecond = 01;
+		private int startingHour =0;
+		private int startingMinute = 0;
+		private int startingSecond = 0;
+		private int startingHour2 =0;
+		private int startingMinute2 = 0;
+		private int startingSecond2 = 0;
+		private int startingHour3 =0;
+		private int startingMinute3 = 0;
+		private int startingSecond3 = 0;
+		private int startingHour4 =0;
+		private int startingMinute4 = 0;
+		private int startingSecond4 = 0;
+		private int startingHour5 =0;
+		private int startingMinute5 = 0;
+		private int startingSecond5 = 0;
         // User defined variables (add any user defined variables below)
 		private double aboveLimit = 0;
 		private double belowLimit = 100;
@@ -200,6 +212,47 @@ namespace NinjaTrader.Strategy
 					return false;
 				}
 		}
+				protected bool timeframe2(){
+			if (//Times[0][0].DayOfWeek == DayOfWeek.Monday && 
+				Times[0][0].Hour >= StartingHour2 
+				&& Times[0][0].Minute >= StartingMinute2 
+				&& Times[0][0].Second>= StartingSecond2){
+					return true;
+				} else {
+					return false;
+				}
+		}
+		protected bool timeframe3(){
+			if (//Times[0][0].DayOfWeek == DayOfWeek.Monday && 
+				Times[0][0].Hour >= StartingHour3 
+				&& Times[0][0].Minute >= StartingMinute3 
+				&& Times[0][0].Second>= StartingSecond3){
+					return true;
+				} else {
+					return false;
+				}
+		}
+		protected bool timeframe4(){
+			if (//Times[0][0].DayOfWeek == DayOfWeek.Monday && 
+				Times[0][0].Hour >= StartingHour4 
+				&& Times[0][0].Minute >= StartingMinute4 
+				&& Times[0][0].Second>= StartingSecond4){
+					return true;
+				} else {
+					return false;
+				}
+		}
+		protected bool timeframe5(){
+			if (//Times[0][0].DayOfWeek == DayOfWeek.Monday && 
+				Times[0][0].Hour >= StartingHour5 
+				&& Times[0][0].Minute >= StartingMinute5 
+				&& Times[0][0].Second>= StartingSecond5){
+					return true;
+				} else {
+					return false;
+				}
+		}
+
 		protected bool checkOverSoldRsi15min(){
 			if (rsiArray15[0]<33){
 				//Log("15 min RSI is long",LogLevel.Information);
@@ -249,7 +302,11 @@ namespace NinjaTrader.Strategy
 					&& shortIsPositive
 					&& rocFilter()
 					&& !checkOverBoughtRsi15min()
-					&& timeframe())
+					&& timeframe()
+					&& timeframe2()
+					&& timeframe3()
+					&& timeframe4()
+					&& timeframe5())
            	 	{
 					this.longPriceDif = 0;
             	    EnterLong(DefaultQuantity, "");
@@ -273,6 +330,10 @@ namespace NinjaTrader.Strategy
 					&& rocFilter()
 					&& !checkOverSoldRsi15min()
 					&& timeframe()
+					&& timeframe2()
+					&& timeframe3()
+					&& timeframe4()
+					&& timeframe5()
 					)
             	{
 					this.shortPriceDif= 0;
@@ -450,6 +511,78 @@ namespace NinjaTrader.Strategy
         {
             get { return startingSecond; }
             set { startingSecond = Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int StartingHour2
+        {
+            get { return startingHour2; }
+            set { startingHour2 = Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int StartingMinute2
+        {
+            get { return startingMinute2; }
+            set { startingMinute2 = Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int StartingSecond2
+        {
+            get { return startingSecond2; }
+            set { startingSecond2 = Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int StartingHour3
+        {
+            get { return startingHour3; }
+            set { startingHour3 = Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int StartingMinute3
+        {
+            get { return startingMinute3; }
+            set { startingMinute3 = Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int StartingSecond3
+        {
+            get { return startingSecond3; }
+            set { startingSecond3 = Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int StartingHour4
+        {
+            get { return startingHour4; }
+            set { startingHour4 = Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int StartingMinute4
+        {
+            get { return startingMinute4; }
+            set { startingMinute4 = Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int StartingSecond4
+        {
+            get { return startingSecond4; }
+            set { startingSecond4 = Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int StartingHour5
+        {
+            get { return startingHour5; }
+            set { startingHour5= Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int StartingMinute5
+        {
+            get { return startingMinute5; }
+            set { startingMinute5 = Math.Max(0, value); }
+        }
+		[GridCategory("Parameters")]
+        public int StartingSecond5
+        {
+            get { return startingSecond5; }
+            set { startingSecond5 = Math.Max(0, value); }
         }
 
 

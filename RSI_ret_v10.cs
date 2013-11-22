@@ -45,9 +45,9 @@ namespace NinjaTrader.Strategy
 		private int turnLastStopMinOn = 0;
 		private int longRsiPeriod =9;
 		private int longRsiLength = 15;
-		private int startingHour = 12;
-		private int startingMinute = 21;
-		private int startingSecond = 01;
+		private int startingHour = 0;
+		private int startingMinute = 0;
+		private int startingSecond = 0;
 
         // User defined variables (add any user defined variables below)
 		private double aboveLimit = 0;

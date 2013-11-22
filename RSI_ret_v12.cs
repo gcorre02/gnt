@@ -254,6 +254,24 @@ namespace NinjaTrader.Strategy
 				}
 		}
 		protected bool timeframe2(){
+				DateTime targetTime = new DateTime(Times[0][0].Year,
+				Times[0][0].Month,
+				Times[0][0].Day,
+				StartingHour2, 
+				StartingMinute2,
+				StartingSecond2,
+				DateTimeKind.Local); //= new DateTime();
+			TimeSpan target = new TimeSpan(0,15,0);
+			TimeSpan zero = new TimeSpan(0,0,0);
+			//Print("target is "+target.ToString() + " and difference between setUp and currentTime is" + targetTime.Subtract(Times[0][0]));
+			if(targetTime.Subtract(Times[0][0])<target
+				&& targetTime.Subtract(Times[0][0])>zero){
+				if(Position.MarketPosition == MarketPosition.Long){
+					ExitLong("onlyOrder");
+				} else if(Position.MarketPosition == MarketPosition.Short){
+					ExitShort("onlyOrder");
+				}
+			}
 			if (//Times[0][0].DayOfWeek == DayOfWeek.Monday && 
 				Times[0][0].Hour >= StartingHour2 
 				&& Times[0][0].Minute >= StartingMinute2 
@@ -266,6 +284,24 @@ namespace NinjaTrader.Strategy
 				}
 		}
 		protected bool timeframe3(){
+				DateTime targetTime = new DateTime(Times[0][0].Year,
+				Times[0][0].Month,
+				Times[0][0].Day,
+				StartingHour3, 
+				StartingMinute3,
+				StartingSecond3,
+				DateTimeKind.Local); //= new DateTime();
+			TimeSpan target = new TimeSpan(0,15,0);
+			TimeSpan zero = new TimeSpan(0,0,0);
+			//Print("target is "+target.ToString() + " and difference between setUp and currentTime is" + targetTime.Subtract(Times[0][0]));
+			if(targetTime.Subtract(Times[0][0])<target
+				&& targetTime.Subtract(Times[0][0])>zero){
+				if(Position.MarketPosition == MarketPosition.Long){
+					ExitLong("onlyOrder");
+				} else if(Position.MarketPosition == MarketPosition.Short){
+					ExitShort("onlyOrder");
+				}
+			}
 			if (//Times[0][0].DayOfWeek == DayOfWeek.Monday && 
 				Times[0][0].Hour >= StartingHour3 
 				&& Times[0][0].Minute >= StartingMinute3 
@@ -278,6 +314,24 @@ namespace NinjaTrader.Strategy
 				}
 		}
 		protected bool timeframe4(){
+				DateTime targetTime = new DateTime(Times[0][0].Year,
+				Times[0][0].Month,
+				Times[0][0].Day,
+				StartingHour4, 
+				StartingMinute4,
+				StartingSecond4,
+				DateTimeKind.Local); //= new DateTime();
+			TimeSpan target = new TimeSpan(0,15,0);
+			TimeSpan zero = new TimeSpan(0,0,0);
+			//Print("target is "+target.ToString() + " and difference between setUp and currentTime is" + targetTime.Subtract(Times[0][0]));
+			if(targetTime.Subtract(Times[0][0])<target
+				&& targetTime.Subtract(Times[0][0])>zero){
+				if(Position.MarketPosition == MarketPosition.Long){
+					ExitLong("onlyOrder");
+				} else if(Position.MarketPosition == MarketPosition.Short){
+					ExitShort("onlyOrder");
+				}
+			}
 			if (//Times[0][0].DayOfWeek == DayOfWeek.Monday && 
 				Times[0][0].Hour >= StartingHour4 
 				&& Times[0][0].Minute >= StartingMinute4 
@@ -290,6 +344,24 @@ namespace NinjaTrader.Strategy
 				}
 		}
 		protected bool timeframe5(){
+				DateTime targetTime = new DateTime(Times[0][0].Year,
+				Times[0][0].Month,
+				Times[0][0].Day,
+				StartingHour5, 
+				StartingMinute5,
+				StartingSecond5,
+				DateTimeKind.Local); //= new DateTime();
+			TimeSpan target = new TimeSpan(0,15,0);
+			TimeSpan zero = new TimeSpan(0,0,0);
+			//Print("target is "+target.ToString() + " and difference between setUp and currentTime is" + targetTime.Subtract(Times[0][0]));
+			if(targetTime.Subtract(Times[0][0])<target
+				&& targetTime.Subtract(Times[0][0])>zero){
+				if(Position.MarketPosition == MarketPosition.Long){
+					ExitLong("onlyOrder");
+				} else if(Position.MarketPosition == MarketPosition.Short){
+					ExitShort("onlyOrder");
+				}
+			}
 			if (//Times[0][0].DayOfWeek == DayOfWeek.Monday && 
 				Times[0][0].Hour >= StartingHour5 
 				&& Times[0][0].Minute >= StartingMinute5 
@@ -317,6 +389,10 @@ namespace NinjaTrader.Strategy
 				itsOn = 0;
 			}
 			timeframe();
+			timeframe2();
+			timeframe3();
+			timeframe4();
+			timeframe5();
 			if(CurrentBar < RSIPeriod || itsOn == 0){
 				return;
 			}

@@ -70,6 +70,8 @@ namespace NinjaTrader.Strategy
 		private int endingMinute4 = 59;
 		private int endingHour5 = 23;
 		private int endingMinute5 = 59;
+		private bool getOutBeforeWindow = true;
+		private int closeMinutesBefore = 15;
 
         // User defined variables (add any user defined variables below)
 		private double aboveLimit = 0;
@@ -89,6 +91,7 @@ namespace NinjaTrader.Strategy
         /// </summary>
         protected override void Initialize()
         {
+			//sendEmail(); need to configure it first under the settings;
             SetProfitTarget("", CalculationMode.Ticks, Profit);
 			if(TurnExitOn ==1){
 				ExitOnClose= true;
@@ -106,13 +109,12 @@ namespace NinjaTrader.Strategy
 			rsiArray15 = new Double[storePreviousRsiMax];
 			rocArray = new Double[storePreviousRsiMax];
 			Add(PeriodType.Minute, LongRsiLength);
-			if(Position.MarketPosition == MarketPosition.Long){
-					ExitLong();//maybe it is wrong name ?
-			} else if(Position.MarketPosition == MarketPosition.Short){
-					ExitShort();//maybe it is wrong name ? // alternative : ExitShort("onlyOrder");
-			}
 		}
+		protected void sendEmail(){
+		//	SendMail("guilherme.ctr@gmail.com", "cbrundan@gmail.com", "NinjaMail", "Hello, mail sending is working. Pretty Simple actually.");
+			SendMail("guilherme.ctr@gmail.com", "guilherme.ctr@gmail.com", "NinjaMail", "Hello, mail sending is working. Pretty Simple actually.");
 
+		}
 		protected void getRsiRecentHigh(){
 			int len = storePreviousRsiMax;
 			for (int i = len-1; i > 0; i--){
@@ -136,6 +138,7 @@ namespace NinjaTrader.Strategy
 		}
 
 		protected String getRsiArrayContents(){
+			//this method just prints the contents of the array;
 			String result = "";
 			for(int i = 0; i < storePreviousRsiMax; i++){
 				result = result + " , " + rsiArray[i];
@@ -146,7 +149,7 @@ namespace NinjaTrader.Strategy
 			if(TurnRocFilterOn == 0){
 				ROCDif = 0;
 			}
-			double maxROC = Math.Max(Math.Abs(rocArray[0]),Math.Abs(rocArray[1]));
+			double maxROC = Math.Max(Math.Abs(rocArray[0]),Math.Abs(rocArray[1]));// this only gets the max between current and previous
 			if(maxROC>ROCDif){
 				return true;
 			}  else {
@@ -235,11 +238,12 @@ namespace NinjaTrader.Strategy
 				StartingMinute,
 				StartingSecond,
 				DateTimeKind.Local); //= new DateTime();
-			TimeSpan target = new TimeSpan(0,15,0);
+			TimeSpan target = new TimeSpan(0,closeMinutesBefore,0);
 			TimeSpan zero = new TimeSpan(0,0,0);
 			//Print("target is "+target.ToString() + " and difference between setUp and currentTime is" + targetTime.Subtract(Times[0][0]));
 			if(targetTime.Subtract(Times[0][0])<target
-				&& targetTime.Subtract(Times[0][0])>zero){
+				&& targetTime.Subtract(Times[0][0])>zero
+				&& GetOutBeforeWindow){
 				if(Position.MarketPosition == MarketPosition.Long){
 					ExitLong("onlyOrder");
 				} else if(Position.MarketPosition == MarketPosition.Short){
@@ -266,11 +270,12 @@ namespace NinjaTrader.Strategy
 				StartingMinute2,
 				StartingSecond2,
 				DateTimeKind.Local); //= new DateTime();
-			TimeSpan target = new TimeSpan(0,15,0);
+			TimeSpan target = new TimeSpan(0,closeMinutesBefore,0);
 			TimeSpan zero = new TimeSpan(0,0,0);
 			//Print("target is "+target.ToString() + " and difference between setUp and currentTime is" + targetTime.Subtract(Times[0][0]));
 			if(targetTime.Subtract(Times[0][0])<target
-				&& targetTime.Subtract(Times[0][0])>zero){
+				&& targetTime.Subtract(Times[0][0])>zero
+				&& GetOutBeforeWindow){
 				if(Position.MarketPosition == MarketPosition.Long){
 					ExitLong("onlyOrder");
 				} else if(Position.MarketPosition == MarketPosition.Short){
@@ -296,11 +301,12 @@ namespace NinjaTrader.Strategy
 				StartingMinute3,
 				StartingSecond3,
 				DateTimeKind.Local); //= new DateTime();
-			TimeSpan target = new TimeSpan(0,15,0);
+			TimeSpan target = new TimeSpan(0,closeMinutesBefore,0);
 			TimeSpan zero = new TimeSpan(0,0,0);
 			//Print("target is "+target.ToString() + " and difference between setUp and currentTime is" + targetTime.Subtract(Times[0][0]));
 			if(targetTime.Subtract(Times[0][0])<target
-				&& targetTime.Subtract(Times[0][0])>zero){
+				&& targetTime.Subtract(Times[0][0])>zero
+				&& GetOutBeforeWindow){
 				if(Position.MarketPosition == MarketPosition.Long){
 					ExitLong("onlyOrder");
 				} else if(Position.MarketPosition == MarketPosition.Short){
@@ -326,11 +332,12 @@ namespace NinjaTrader.Strategy
 				StartingMinute4,
 				StartingSecond4,
 				DateTimeKind.Local); //= new DateTime();
-			TimeSpan target = new TimeSpan(0,15,0);
+			TimeSpan target = new TimeSpan(0,closeMinutesBefore,0);
 			TimeSpan zero = new TimeSpan(0,0,0);
 			//Print("target is "+target.ToString() + " and difference between setUp and currentTime is" + targetTime.Subtract(Times[0][0]));
 			if(targetTime.Subtract(Times[0][0])<target
-				&& targetTime.Subtract(Times[0][0])>zero){
+				&& targetTime.Subtract(Times[0][0])>zero
+				&& GetOutBeforeWindow){
 				if(Position.MarketPosition == MarketPosition.Long){
 					ExitLong("onlyOrder");
 				} else if(Position.MarketPosition == MarketPosition.Short){
@@ -356,11 +363,12 @@ namespace NinjaTrader.Strategy
 				StartingMinute5,
 				StartingSecond5,
 				DateTimeKind.Local); //= new DateTime();
-			TimeSpan target = new TimeSpan(0,15,0);
+			TimeSpan target = new TimeSpan(0,closeMinutesBefore,0);
 			TimeSpan zero = new TimeSpan(0,0,0);
 			//Print("target is "+target.ToString() + " and difference between setUp and currentTime is" + targetTime.Subtract(Times[0][0]));
 			if(targetTime.Subtract(Times[0][0])<target
-				&& targetTime.Subtract(Times[0][0])>zero){
+				&& targetTime.Subtract(Times[0][0])>zero
+				&& GetOutBeforeWindow){
 				if(Position.MarketPosition == MarketPosition.Long){
 					ExitLong("onlyOrder");
 				} else if(Position.MarketPosition == MarketPosition.Short){
@@ -382,13 +390,8 @@ namespace NinjaTrader.Strategy
 		
         protected override void OnBarUpdate()
         {
-		//	Print(" This is the position: " + Position.MarketPosition.ToString()+ " and the 15min rsi is " + rsiArray15[0]);
-		//	Print(" This is the position: " + Positions[0].MarketPosition.ToString()+ " and the 15min rsi is " + rsiArray15[0]);
-			//Log(" This is the position: " + Positions[0].MarketPosition.ToString(), LogLevel.Information);
 			if((GetCurrentAsk()-GetCurrentBid())<BidAsk*TickSize 
-				&& checkRoundNum()
-				//&& checkLongRsi()
-				){//&& checkDay()){
+				&& checkRoundNum()){
 				itsOn = 1;
 			} else {
 				itsOn = 0;
@@ -765,11 +768,26 @@ namespace NinjaTrader.Strategy
             get { return endingHour5; }
             set { endingHour5= Math.Max(0, value); }
         }
+		
+		[GridCategory("Parameters")]
+        public int CloseMinutesBefore
+        {
+            get { return closeMinutesBefore; }
+            set { closeMinutesBefore= Math.Max(0, value); }
+        }
+
 		[GridCategory("Parameters")]
         public int EndingMinute5
         {
             get { return endingMinute5; }
-            set { endingMinute5 = Math.Max(0, value); }
+            set { endingMinute5= Math.Max(0, value); }
+        }
+		
+		[GridCategory("Parameters")]
+        public bool GetOutBeforeWindow
+        {
+            get { return getOutBeforeWindow; }
+            set { getOutBeforeWindow =value; }
         }
 
 

@@ -23,7 +23,7 @@ namespace NinjaTrader.Strategy
     {
         #region Variables
         // Wizard generated variables
-
+		private bool instant = true;
         private int entryLevelDif = 0; // Default setting for EntryLevelDif
         private int stopLoss = 30; // Default setting for StopLoss
         private int profit = 40; // Default setting for Profit
@@ -71,7 +71,17 @@ namespace NinjaTrader.Strategy
 		private int endingHour5 = 23;
 		private int endingMinute5 = 59;
 		private bool getOutBeforeWindow = true;
+		private bool getOutBeforeWindow2 = true;
+		private bool getOutBeforeWindow3 = true;
+		private bool getOutBeforeWindow4 = true;
+		private bool getOutBeforeWindow5 = true;
 		private int closeMinutesBefore = 15;
+		private bool windowIO = true;
+		private bool windowIO2 = true;
+		private bool windowIO3 = true;
+		private bool windowIO4 = true;
+		private bool windowIO5 = true;
+		
 
         // User defined variables (add any user defined variables below)
 		private double aboveLimit = 0;
@@ -110,6 +120,25 @@ namespace NinjaTrader.Strategy
 			rocArray = new Double[storePreviousRsiMax];
 			Add(PeriodType.Minute, LongRsiLength);
 		}
+		protected bool windowsIO(){
+			if(	(
+				WindowIO
+				||WindowIO2
+				||WindowIO3
+				||WindowIO4
+				||WindowIO5
+				)&&
+				(!timeframe()
+				||!timeframe2()
+				|| !timeframe3()
+				|| !timeframe4()
+				|| !timeframe5())
+				){
+					return true;
+			} else {
+				return false;
+			}
+		}
 		protected void sendEmail(){
 		//	SendMail("guilherme.ctr@gmail.com", "cbrundan@gmail.com", "NinjaMail", "Hello, mail sending is working. Pretty Simple actually.");
 			SendMail("guilherme.ctr@gmail.com", "guilherme.ctr@gmail.com", "NinjaMail", "Hello, mail sending is working. Pretty Simple actually.");
@@ -122,13 +151,14 @@ namespace NinjaTrader.Strategy
 			}
 			rsiArray[0] = RSI(RSIPeriod,3)[0];
 		}
-		protected void getRsi15RecentHigh(){
+		protected void getRsi15RecentHigh(){ // how about lows ? arent those important ?
 			int len = storePreviousRsiMax;
 			for (int i = len-1; i > 0; i--){
 				rsiArray15[i] = rsiArray15[i-1];
 			}
 			rsiArray15[0] = RSI(BarsArray[1],LongRsiPeriod,3)[0];
 		}
+		
 		protected void getRocRecentHigh(){
 			int len = storePreviousRsiMax;
 			for (int i = len-1; i > 0; i--){
@@ -149,7 +179,12 @@ namespace NinjaTrader.Strategy
 			if(TurnRocFilterOn == 0){
 				ROCDif = 0;
 			}
-			double maxROC = Math.Max(Math.Abs(rocArray[0]),Math.Abs(rocArray[1]));// this only gets the max between current and previous
+			double maxROC;
+			if(Instant){
+				maxROC = Math.Max(Math.Abs(rocArray[0]),Math.Abs(rocArray[1]));// this only gets the max between current and previous
+			} else {
+				maxROC = ROC(ROCPeriod)[0];
+			}
 			if(maxROC>ROCDif){
 				return true;
 			}  else {
@@ -165,19 +200,37 @@ namespace NinjaTrader.Strategy
 			*/
 		}
 		protected bool checkOverBoughtRsi15min(){
-			if(rsiArray15[0]>67){
+			if(Instant){
+				if(rsiArray15[0]>67){
 				//Log("15 min RSI is long",LogLevel.Information);
-				return true;
+					return true;
+				} else {
+					return false;
+				}
 			} else {
-				return false;
+				if(RSI(BarsArray[1],LongRsiPeriod,3)[0]>67){
+				//Log("15 min RSI is long",LogLevel.Information);
+					return true;
+				} else {
+					return false;
+				}
 			}
 		}
 		protected bool checkOverSoldRsi15min(){
-			if (rsiArray15[0]<33){
-				//Log("15 min RSI is long",LogLevel.Information);
-				return true;
+			if(Instant){
+				if (rsiArray15[0]<33){
+					//Log("15 min RSI is long",LogLevel.Information);
+					return true;
+				} else {
+					return false;
+				}
 			} else {
-				return false;
+				if (RSI(BarsArray[1],LongRsiPeriod,3)[0]<33){
+					//Log("15 min RSI is long",LogLevel.Information);
+					return true;
+				} else {
+					return false;
+				}
 			}
 		}
 
@@ -275,7 +328,7 @@ namespace NinjaTrader.Strategy
 			//Print("target is "+target.ToString() + " and difference between setUp and currentTime is" + targetTime.Subtract(Times[0][0]));
 			if(targetTime.Subtract(Times[0][0])<target
 				&& targetTime.Subtract(Times[0][0])>zero
-				&& GetOutBeforeWindow){
+				&& GetOutBeforeWindow2){
 				if(Position.MarketPosition == MarketPosition.Long){
 					ExitLong("onlyOrder");
 				} else if(Position.MarketPosition == MarketPosition.Short){
@@ -306,7 +359,7 @@ namespace NinjaTrader.Strategy
 			//Print("target is "+target.ToString() + " and difference between setUp and currentTime is" + targetTime.Subtract(Times[0][0]));
 			if(targetTime.Subtract(Times[0][0])<target
 				&& targetTime.Subtract(Times[0][0])>zero
-				&& GetOutBeforeWindow){
+				&& GetOutBeforeWindow3){
 				if(Position.MarketPosition == MarketPosition.Long){
 					ExitLong("onlyOrder");
 				} else if(Position.MarketPosition == MarketPosition.Short){
@@ -337,7 +390,7 @@ namespace NinjaTrader.Strategy
 			//Print("target is "+target.ToString() + " and difference between setUp and currentTime is" + targetTime.Subtract(Times[0][0]));
 			if(targetTime.Subtract(Times[0][0])<target
 				&& targetTime.Subtract(Times[0][0])>zero
-				&& GetOutBeforeWindow){
+				&& GetOutBeforeWindow4){
 				if(Position.MarketPosition == MarketPosition.Long){
 					ExitLong("onlyOrder");
 				} else if(Position.MarketPosition == MarketPosition.Short){
@@ -368,7 +421,7 @@ namespace NinjaTrader.Strategy
 			//Print("target is "+target.ToString() + " and difference between setUp and currentTime is" + targetTime.Subtract(Times[0][0]));
 			if(targetTime.Subtract(Times[0][0])<target
 				&& targetTime.Subtract(Times[0][0])>zero
-				&& GetOutBeforeWindow){
+				&& GetOutBeforeWindow5){
 				if(Position.MarketPosition == MarketPosition.Long){
 					ExitLong("onlyOrder");
 				} else if(Position.MarketPosition == MarketPosition.Short){
@@ -424,7 +477,11 @@ namespace NinjaTrader.Strategy
 				}
 			}
 			if(rsiArray[0]<OverSoldLevel){
-				belowLimit = rsiArray[1];
+				if(Instant){
+					belowLimit = rsiArray[1];
+				} else {
+					belowLimit = RSI(RSIPeriod,3)[1];
+				}
         	    if (CrossAbove(RSI(RSIPeriod,3), belowLimit, 1) 
 					&& (RSI(RSIPeriod,3)[0]-belowLimit>=entryLevelDif )
 					&& checkRecentLossDirection() != "Long"
@@ -432,11 +489,7 @@ namespace NinjaTrader.Strategy
 					&& shortIsPositive
 					&& rocFilter()
 					&& !checkOverBoughtRsi15min()
-					&& (timeframe()
-					|| timeframe2()
-					|| timeframe3()
-					|| timeframe4()
-					|| timeframe5()))
+					&& windowsIO())
            	 	{
 					this.longPriceDif = 0;
             	    EnterLong(DefaultQuantity, "onlyOrder");
@@ -451,19 +504,19 @@ namespace NinjaTrader.Strategy
 				}
 			}
 			if(rsiArray[0]>OverBoughtLevel){
-				aboveLimit = rsiArray[1];         
-            	if (CrossBelow(RSI(RSIPeriod,3), aboveLimit, 1)
+				if(Instant){
+					aboveLimit = rsiArray[1];
+				} else {
+					aboveLimit = RSI(RSIPeriod,3)[1];
+				}
+				if (CrossBelow(RSI(RSIPeriod,3), aboveLimit, 1)
 					&& ( aboveLimit-RSI(RSIPeriod,3)[0]>=entryLevelDif) 
 					&& checkRecentLossDirection() != "Short"
 					&& (Close[0] > this.shortPriceDif || this.shortPriceDif == 0)
 					&& longIsPositive
 					&& rocFilter()
 					&& !checkOverSoldRsi15min()
-					&& (timeframe()
-					|| timeframe2()
-					|| timeframe3()
-					|| timeframe4()
-					|| timeframe5())
+					&& windowsIO()
 					)
             	{
 					this.shortPriceDif= 0;
@@ -789,6 +842,67 @@ namespace NinjaTrader.Strategy
             get { return getOutBeforeWindow; }
             set { getOutBeforeWindow =value; }
         }
+		[GridCategory("Parameters")]
+        public bool GetOutBeforeWindow2
+        {
+            get { return getOutBeforeWindow; }
+            set { getOutBeforeWindow =value; }
+        }
+		[GridCategory("Parameters")]
+        public bool GetOutBeforeWindow3
+        {
+            get { return getOutBeforeWindow; }
+            set { getOutBeforeWindow =value; }
+        }	
+		[GridCategory("Parameters")]
+        public bool GetOutBeforeWindow4
+        {
+            get { return getOutBeforeWindow; }
+            set { getOutBeforeWindow =value; }
+        }
+		[GridCategory("Parameters")]
+        public bool GetOutBeforeWindow5
+        {
+            get { return getOutBeforeWindow; }
+            set { getOutBeforeWindow =value; }
+        }
+		[GridCategory("Parameters")]
+        public bool WindowIO
+        {
+            get { return windowIO; }
+            set { windowIO =value; }
+        }
+		[GridCategory("Parameters")]
+        public bool WindowIO2
+        {
+            get { return windowIO2; }
+            set { windowIO2 =value; }
+        }
+		[GridCategory("Parameters")]
+        public bool WindowIO3
+        {
+            get { return windowIO3; }
+            set { windowIO3 =value; }
+        }
+		[GridCategory("Parameters")]
+        public bool WindowIO4
+        {
+            get { return windowIO4; }
+            set { windowIO4 =value; }
+        }
+		[GridCategory("Parameters")]
+        public bool WindowIO5
+        {
+            get { return windowIO5; }
+            set { windowIO5 =value; }
+        }
+		[GridCategory("Parameters")]
+        public bool Instant
+        {
+            get { return instant; }
+            set { instant =value; }
+        }
+		
 
 
 

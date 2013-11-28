@@ -159,9 +159,9 @@ namespace NinjaTrader.Strategy
 			}
 			double maxROC;
 			if(InstantROC){
-				maxROC = Math.Max(Math.Abs(rocArray[0]),Math.Abs(rocArray[1]));// this only gets the max between current and previous
+				maxROC = Math.Max(Math.Abs(rocArray[0]),Math.Abs(rocArray[0]));// this only gets the max between current and previous
 			} else {
-				maxROC = ROC(ROCPeriod)[0];
+				maxROC = Math.Abs(ROC(ROCPeriod)[0]);
 			}
 			if(maxROC>ROCDif){
 				return true;
@@ -278,6 +278,7 @@ namespace NinjaTrader.Strategy
 		}
         protected override void OnBarUpdate()
         {
+
 			//booleans
 			#region
 			if(InstantIOstr == 1 ){
@@ -315,6 +316,8 @@ namespace NinjaTrader.Strategy
 			getRsiRecentHigh();
 			getRsi15RecentHigh();
 			getRocRecentHigh();
+			//Print(" ROC: "+Math.Abs(ROC(ROCPeriod)[0])+" ; ROC instant: "+Math.Abs(rocArray[0])+" ; RSI15: "+RSI(BarsArray[1],LongRsiPeriod,3)[0]+" ; RSI15instant: "+rsiArray15[0]);
+
 			
 			//checks for width of the Bid/Ask delta, doesnt work on backtest 
 			//---- need to create Bars based on highs and lows for it to work ----

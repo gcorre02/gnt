@@ -313,6 +313,8 @@ namespace NinjaTrader.Strategy
 			#endregion
 			//Load rsi values to array
 			getRsiRecentHigh();
+			getRsi15RecentHigh();
+			getRocRecentHigh();
 			
 			//checks for width of the Bid/Ask delta, doesnt work on backtest 
 			//---- need to create Bars based on highs and lows for it to work ----
